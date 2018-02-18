@@ -1,0 +1,50 @@
+body{
+  margin: 0;
+  padding: 0;
+  font-family: 'Kavivanar', cursive;
+}
+
+.question{
+  display: inline-block;
+  margin: 0 auto;
+  padding: 3%;
+  border: 3px dashed black;
+}
+
+.row{
+  padding: 0;
+  margin: 0;
+}
+
+.answer{
+  padding-left: 3%;
+  padding-right: 3%;
+  padding-top: 1%;
+  padding-bottom: 1%;
+}
+
+.infoBox{
+  outline: 1px solid blue;
+}
+
+.answerBox{
+  outline: 1px solid green;
+}
+
+.logo{
+  background-color: yellow;
+  box-shadow: 5px 0px 10px #888888;
+}
+
+.logo-img{
+  padding-top: 1%;
+  padding-bottom: 1%;
+}
+
+.answerButton{
+  padding-top: 3%;
+}
+
+.startButton{
+  margin-top: 3%;
+}
