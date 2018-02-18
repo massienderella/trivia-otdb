@@ -1,35 +1,66 @@
-//AUTENTICACIÓN CON FIREBASE
-
-  // Initialize Firebase
-  var config = {
+/*// inicio sesión con firebase
+$(document).ready(function() {
+  // para que siempre esté deslogeado
+  firebase.auth().signOut();
+  $('#start').hide();
+  $('button').hide();
+});
+// Al hacer click en el boton de registro con google:
+document.getElementById('btnsignUp').addEventListener('click', GoogleSignUp, false);
+// Initialize Firebase
+var config = {
     apiKey: "AIzaSyA9kHhoH3jqulXjnO3I3zMYu64lkV_9dUs",
     authDomain: "trivia-69c2b.firebaseapp.com",
     databaseURL: "https://trivia-69c2b.firebaseio.com",
     projectId: "trivia-69c2b",
     storageBucket: "trivia-69c2b.appspot.com",
     messagingSenderId: "489651669941"
-  };
-  firebase.initializeApp(config);
-
-  var provider = new firebase.auth.GoogleAuthProvider();
-  firebase.auth().signInWithPopup(provider).then(function(result) {
-  // This gives you a Google Access Token. You can use it to access the Google API.
-  var token = result.credential.accessToken;
-  // The signed-in user info.
-  var user = result.user;
-  // ...
-}).catch(function(error) {
-  // Handle Errors here.
-  var errorCode = error.code;
-  var errorMessage = error.message;
-  // The email of the user's account used.
-  var email = error.email;
-  // The firebase.auth.AuthCredential type that was used.
-  var credential = error.credential;
-  // ...
-});
-
-
+};
+firebase.initializeApp(config);
+// función de ingreso con google
+var token = 'none';
+var user = 'none';
+var email = 'none';
+// guardar los usuarios que se registren
+var userData = firebase.database().ref('users');
+function GoogleSignUp() {
+  if (!firebase.auth().currentUser) {
+    // para saber si el usuario se ha conectado
+    var provider = new firebase.auth.GoogleAuthProvider();
+    provider.addScope('https://www.googleapis.com/auth/contacts.readonly');
+    firebase.auth().signInWithPopup(provider).then(function(result) {
+      token = result.credential.accessToken;
+      user = result.user;
+      email = user.email;
+      $('.google-sign').hide() && $('#start').show();
+      // guardar el nombre de usuario en firebase
+      userData.orderByChild('email').equalTo(user.email).on('value', function(snapshot) {
+        // console.log(snapshot.val());
+        if (snapshot.val() === null) {
+          // console.log('Nuevo Usuario');
+          userData.push({
+            photo: user.photoURL,
+            name: user.displayName,
+            email: user.email
+          });
+        } else {
+          // console.log('Usuario Existente');
+        }
+      });
+    }).catch(function(error) {
+      var errorCode = error.code;
+      var errorMessage = error.message;
+      var errorEmail = error.email;
+      var credencial = error.credencial;
+      // console.log(errorCode);
+      if (errorCode === 'auth/account-exists-with-different-credential') {
+        alert('Es el mismo usuario');
+      }
+    });
+  } else {
+    firebase.auth().signOut();
+  }
+} */
 
 
 //TRABAJO CON API
@@ -54,7 +85,9 @@ $(document).ready(() =>{
 
  // Extraer información desde JSON y crear elementos para mostrarla en pantalla 
 function showInfo(info) {
-   let index = 0
+   let index = 0;
+   let correct = 0;
+   let correctAnswers = [];
    let category = info.results[index].category;    
    let difficulty = info.results[index].difficulty;    
    let questions = info.results[index].question;
@@ -86,16 +119,30 @@ function showInfo(info) {
 
     $('#start').hide();
     $('.option').on('click', function() {
-      if ($(this) === rightAnswer) {
+      //Para la respuesta correcta
+      if ($(this).text() === rightAnswer && index !== 10) {
         $('#start').text('Next question');
         $('#start').show();
-        $('.questionBox').empty();
-        $('.questionBox').append('<h1 class="message">Well done!!</h1><img src="assets/img/perritofeliz.jpg" alt="">');
-        } else {
+        $('.questionBox').html('');
+        $('.resultBox').append('<h1 class="message text-center">Well done!!</h1><img src="assets/img/perritofeliz.jpg" class="img-responsive text-center" alt="">');
+        correct++;
+        } if ($(this).text() !== rightAnswer && index !== 10) {
+      //Para la respuesta incorrecta
         $('#start').text('Next question');
         $('#start').show();
-        $('.questionBox').empty('');
-        $('.questionBox').append('<h1 class="message">Wrong answer, try again!</h1> <img src="assets/img/perritotriste.jpg" alt="">');
+        $('.questionBox').html('');
+        $('.resultBox').append('<h1 class="message text-center">Wrong answer :(</h1> <img src="assets/img/perritotriste.jpg" class="img-responsive text-center" alt="">');
+      }
+      index++;
+      if (index === 10) {
+        $('.questionBox').html('');
+            $('.title').text('Your results');
+            $('.title').show();
+            $('#start').hide();
+            $('.resultBox').html(`You got ${countCorrect} out of ${counter}`);
+            let answersDisplay = data.results.forEach(function(element) {
+            $('.questionBox').append(`<p class="questionResults questionResultsQuestion">Question:</p> <p class="displayQuestionResult">${element.question}</p> <p class="questionResults">Correct answer:</p> <p class="correctAnswer">${element.correct_answer}</p>`); 
+          });
       }
     });
       
