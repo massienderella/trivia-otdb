@@ -74,7 +74,6 @@ $(document).ready(() =>{
       datatype: 'json'
     })
       .done(function(response) {
-        console.log(response);
         showInfo(response);
       })
       .fail(function() {
@@ -99,18 +98,19 @@ function showInfo(info) {
 
 //Array con posibles respuestas
    let answers = [];
-   answers.push(rightAnswer);
-   answers.push(wrongAnswer1);
-   answers.push(wrongAnswer2);
-   answers.push(wrongAnswer3);
+   info.results[index].incorrect_answers.forEach(function(ans) {
+    answers.push(ans)
+   });
+   answers.push(info.results[index].correct_answer);
+   correctAnswers.push(info.results[index].correct_answer);
+
 // .sort() ordena strings dependiendo de su valor unicode
    answers.sort();
-   console.log(answers);
 
 //Texto a mostrar (categoría + dificultad + pregunta + )
-   $('.questionBox').append('<h4 class="category text-center">' + 'Category: ' + category + '</h4>');
-   $('.questionBox').append('<h4 class="difficulty text-capitalize text-center">' + 'Difficulty: ' + difficulty + '</h4>');
-   $('.questionBox').append('<div class="row text-center"><div class="col-lg-12"><h2 class="question text-center">' + questions + '</h2>');
+   $('.questionBox').append('<h4 class="category text-center">' + 'Category: ' + `${info.results[index].category}` + '</h4>');
+   $('.questionBox').append('<h4 class="difficulty text-capitalize text-center">' + 'Difficulty: ' + `${info.results[index].difficulty}` + '</h4>');
+   $('.questionBox').append('<div class="row text-center"><div class="col-lg-12"><h2 class="question text-center">' + `${info.results[index].question}` + '</h2>');
 
 //.forEach(), para que agregue cada elemento sobre el que itera a .answerBox   
    let answerBox = answers.forEach(function(ans) {
@@ -136,13 +136,10 @@ function showInfo(info) {
       index++;
       if (index === 10) {
         $('.questionBox').html('');
-            $('.title').text('Your results');
-            $('.title').show();
-            $('#start').hide();
-            $('.resultBox').html(`You got ${countCorrect} out of ${counter}`);
-            let answersDisplay = data.results.forEach(function(element) {
-            $('.questionBox').append(`<p class="questionResults questionResultsQuestion">Question:</p> <p class="displayQuestionResult">${element.question}</p> <p class="questionResults">Correct answer:</p> <p class="correctAnswer">${element.correct_answer}</p>`); 
-          });
+          $('.title').text('Here are your stats:');
+          $('.title').show();
+          $('#start').hide();
+          $('.resultBox').html(`You answered ${correct} correctly out of ${index}. Good job!`);
       }
     });
       
